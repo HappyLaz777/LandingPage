@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodCast | AI-Powered Restaurant Optimization</title>
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --secondary: #4CAF50;
+            --accent: #FF6B6B;
+            --dark: #333333;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --gradient-dark: #1e5d3a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background-color: var(--primary);
+            padding: 1rem;
+            color: var(--light);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        header.scrolled {
+            padding: 0.5rem 1rem;
+            background-color: rgba(46, 139, 87, 0.95);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        .logo-icon {
+            margin-right: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('/api/placeholder/1200/600') center/cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: var(--light);
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--accent);
+            color: var(--light);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn:hover {
+            background-color: #e05555;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--light);
+            margin-left: 1rem;
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--light);
+            box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+            40% {transform: translateY(-20px) translateX(-50%);}
+            60% {transform: translateY(-10px) translateX(-50%);}
+        }
+        
+        section {
+            padding: 6rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            display: inline-block;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+        
+        .section-title p {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .problem-box {
+            background: linear-gradient(135deg, var(--primary), var(--gradient-dark));
+            border-radius: 15px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--light);
+            box-shadow: 0 10px 30px rgba(46, 139, 87, 0.2);
+        }
+        
+        .problem-box h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .problem-box p {
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background-color: var(--gray);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .stat-item h3::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+       
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(46, 139, 87, 0.1), rgba(76, 175, 80, 0.1));
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(46, 139, 87, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+        
+        .feature-card:hover .feature-icon::after {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+
+
+
+       /* Testimonials */
+       .testimonials {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+        }
+
+        .testimonial-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .testimonial-card {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            color: var(--dark);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .client-image {
+            width: 50px;
+            height: 50px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .partner-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .logo-placeholder {
+            width: 120px;
+            height: 80px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+
+
+        /* Pricing */
+        .pricing {
+            background-color: var(--background);
+            text-align: center;
+        }
+        
+        .pricing-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .pricing-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            flex: 1 1 300px;
+            max-width: 350px;
+        }
+        
+        .pricing-card.featured {
+            border: 2px solid var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+        
+        .price span {
+            font-size: 1rem;
+            color: var(--light-text);
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .features-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .features-list li::before {
+            content: "✓";
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        .pricing-card.featured {
+    position: relative;
+    transform: scale(1.05);
+    z-index: 1;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.popular-tag {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: #ff6b6b;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+
+  /* Footer */
+  .cta {
+            background-color: var(--primary);
+            color: var(--light);
+            text-align: center;
+            padding: 5rem 1rem;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+        }
+        
+        .contact-form input {
+            padding: 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .footer-links a {
+            color: var(--light);
+            text-decoration: none;
+        }
+        
+        .social-media {
+            margin-bottom: 2rem;
+        }
+        
+        .social-media a {
+            color: var(--light);
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .contact-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+
+
+
+        
+    </style>
+</head>
+
+<body>
+    <header id="header">
+        <nav>
+            <div class="logo"><span class="logo-icon">🥘</span>Smart<span>Shelf</span></div>
+            <div class="nav-links" id="navLinks">
+                <a href="#problem">Problem</a>
+                <a href="#solution">Solution</a>
+                <a href="#features">Features</a>
+                <a href="#testimonials">Results</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+                <button class="mobile-menu-btn close-menu" id="closeMenuBtn">✕</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        </nav>
+    </header>
+    
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Smarter Inventory, Higher Profits</h1>
+            <p>SmartShelf’s AI-powered solution predicts exactly what your business needs, reducing waste by 85% and increasing profits by 24%.</p>
+            <h2>Predict. Prepare. Profit.</h2>
+            <p>Eliminate stockouts, cut food waste, and maximize efficiency with AI-driven inventory management.</p>
+            <a href="#contact" class="btn">Transform Your Store</a>
+            <a href="#demo" class="btn btn-secondary">Watch Demo</a>
+        </div>
+        <div class="scroll-indicator" id="scrollIndicator">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+    <section id="problem">
+        <div class="section-title">
+            <h2>The Retail Blindspot</h2>
+        </div>
+        
+        <div class="problem-box">
+            <h3>Retailers lose $1.75 trillion annually to inventory distortion</h3>
+            <p>Out-of-stock items cost retailers 4.1% in lost sales while overstocking ties up capital and leads to costly markdowns and waste.</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <h3>43%</h3>
+                <p>of shoppers will go to a competitor when faced with an out-of-stock item</p>
+            </div>
+            <div class="stat-item">
+                <h3>25%</h3>
+                <p>of inventory costs are wasted due to inaccurate demand forecasting</p>
+            </div>
+            <div class="stat-item">
+                <h3>8.5hr</h3>
+                <p>weekly time spent by staff on manual inventory counts</p>
+            </div>
+        </div>
+        
+    </section>
+    
+
+
+
+    <section id="smart-features">
+        <div class="section-title">
+            <h2>Why Choose SmartShelf?</h2>
+            <p>Revolutionize your retail or restaurant operations with AI-powered efficiency, cost savings, and real-time insights.</p>
+        </div>
+    
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>AI-Powered Forecasting</h3>
+                <p>Accurately predict daily sales and inventory needs, reducing waste and ensuring just-in-time preparation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Cost Reduction</h3>
+                <p>Cut inventory costs by up to 25% through optimized purchasing and waste elimination.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌱</div>
+                <h3>Sustainable & Eco-Friendly</h3>
+                <p>Reduce your environmental footprint while appealing to eco-conscious customers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Revenue Growth</h3>
+                <p>Boost sales by up to 32% with improved product availability and data-driven merchandising.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏱️</div>
+                <h3>Time & Labor Efficiency</h3>
+                <p>Eliminate 94% of manual inventory counts and speed up prep time with AI-powered accuracy.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Real-Time Alerts</h3>
+                <p>Get instant notifications for stockouts, planogram issues, and theft risks—ensuring quick corrective action.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Secure & Reliable</h3>
+                <p>Operate in a protected environment with data privacy and secure system integration.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Seamless Integration</h3>
+                <p>Connect effortlessly with your ERP, POS, and supply chain systems—setup takes hours, not weeks.</p>
+            </div>
+        </div>
+    </section>
+    
+
+<!-- Testimonials -->
+<section class="testimonials" id="testimonials">
+    <div class="container">
+        <h2>Success Stories From Restaurants Like Yours</h2>
+        <p>Join the growing number of satisfied customers</p>
+        
+        <div class="testimonial-cards">
+            <div class="testimonial-card">
+                <p>"This software cut our food waste by 30% in just one month! The staff scheduling feature has reduced our labor costs by 15% while improving service quality."</p>
+                <div class="client-info">
+                    <div class="client-image"></div>
+                    <div>
+                        <strong>Maria Rodriguez</strong>
+                        <p>Owner, The Fresh Table</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p>"The ROI was almost immediate. We're saving over $3,000 per month on food costs alone, and our inventory management has never been more efficient."</p>
+                <div class="client-info">
+                    <div class="client-image"></div>
+                    <div>
+                        <strong>James Chen</strong>
+                        <p>General Manager, Urban Grill</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+    <div class="container">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the plan that fits your business needs</p>
+        <div class="pricing-container">
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <h3>Starter Plan</h3>
+                <div class="price">$199<span>/month</span></div>
+                <p>Perfect for small cafés and restaurants</p>
+                <ul class="features-list">
+                    <li>Daily sales predictions</li>
+                    <li>Basic inventory forecasting</li>
+                    <li>Email support</li>
+                    <li>30-day free trial</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+            </div>
+            
+            <!-- Professional Plan -->
+            <div class="pricing-card featured">
+                <div class="popular-tag">Most Popular</div>
+                <h3>Professional Plan</h3>
+                <div class="price">$349<span>/month</span></div>
+                <p>Ideal for growing restaurants</p>
+                <ul class="features-list">
+                    <li>Advanced sales predictions</li>
+                    <li>Full inventory optimization</li>
+                    <li>Staff scheduling recommendations</li>
+                    <li>Priority support</li>
+                    <li>30-day free trial</li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+            </div>
+            
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="price">Custom</div>
+                <p>For restaurant groups and chains</p>
+                <ul class="features-list">
+                    <li>Multi-location management</li>
+                    <li>Custom API integrations</li>
+                    <li>Dedicated account manager</li>
+                    <li>Advanced analytics dashboard</li>
+                    <li>Custom reporting</li>
+                </ul>
+                <a href="#contact" class="btn btn-secondary">Start Free Trial</a>
+                <a href="#contact" class="btn btn-primary">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="cta" id="contact">
+    <h2>Ready for Intelligent Inventory?</h2>
+    <p>Join leading restaurants and retailers using SmartShelf’s AI to cut costs, reduce waste, and optimize operations with precision.</p>
+    
+    <div class="contact-form">
+        <input type="email" placeholder="Enter your business email" required>
+        <button type="submit" class="btn">Schedule a Demo</button>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div class="logo">Smart<span>Shelf</span></div>
+        
+        <div class="footer-links">
+            <a href="#problem">Challenge</a>
+            <a href="#solution">Innovation</a>
+            <a href="#benefits">Advantages</a>
+            <a href="#contact">Connect</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+        
+        <div class="social-media">
+            <a href="#">🔹</a>
+            <a href="#">🔸</a>
+            <a href="#">🔹</a>
+            <a href="#">🔸</a>
+        </div>
+        
+        <p>&copy; 2025 SmartShelf Technologies. All rights reserved.</p>
+    </div>
+</footer>
+</body>
+</html>
+Last edited 1 hour ago
